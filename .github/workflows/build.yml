@@ -141,7 +141,9 @@ jobs:
         run: cargo install cargo-ndk
 
       - name: Initialize Android project
-        run: tauri android init 2>/dev/null || true
+        run: |
+          rm -rf src-tauri/gen/android 2>/dev/null || true
+          tauri android init 2>&1
 
       - name: Build Android (APK)
         run: tauri android build --apk
