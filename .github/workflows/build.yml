@@ -145,6 +145,13 @@ jobs:
           rm -rf src-tauri/gen/android 2>/dev/null || true
           tauri android init 2>&1
 
+      - name: Patch BuildTask.kt (use npx instead of node)
+        run: |
+          sed -i 's/val executable = """node"""/val executable = """npx"""/' \
+            src-tauri/gen/android/buildSrc/src/main/java/com/starter_kit_racing/game/kotlin/BuildTask.kt
+          echo "Patched BuildTask.kt:"
+          grep 'executable' src-tauri/gen/android/buildSrc/src/main/java/com/starter_kit_racing/game/kotlin/BuildTask.kt
+
       - name: Build Android (APK)
         run: tauri android build --apk
         env:
