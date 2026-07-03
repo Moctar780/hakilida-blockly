@@ -359,6 +359,10 @@ async function init() {
 
 		requestAnimationFrame( animate );
 
+		// Hide loader on first frame
+		const loader = document.getElementById( 'loader' );
+		if ( loader ) loader.classList.add( 'hidden' );
+
 		timer.update();
 		const dt = Math.min( timer.getDelta(), 1 / 30 );
 
