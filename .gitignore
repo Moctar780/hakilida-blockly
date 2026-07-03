@@ -1,3 +1,13 @@
 _benchmark/
 _godot/
 .DS_Store
+
+# Rust / Tauri
+src-tauri/target/
+
+# Node.js
+node_modules/
+
+# Python
+__pycache__/
+*.pyc

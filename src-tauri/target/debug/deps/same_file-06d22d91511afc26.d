@@ -1,8 +1,0 @@
-/home/moctar/Desktop/test_env/Starter-Kit-Racing/src-tauri/target/debug/deps/same_file-06d22d91511afc26.d: /home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/same-file-1.0.6/src/lib.rs /home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/same-file-1.0.6/src/unix.rs
-
-/home/moctar/Desktop/test_env/Starter-Kit-Racing/src-tauri/target/debug/deps/libsame_file-06d22d91511afc26.rlib: /home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/same-file-1.0.6/src/lib.rs /home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/same-file-1.0.6/src/unix.rs
-
-/home/moctar/Desktop/test_env/Starter-Kit-Racing/src-tauri/target/debug/deps/libsame_file-06d22d91511afc26.rmeta: /home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/same-file-1.0.6/src/lib.rs /home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/same-file-1.0.6/src/unix.rs
-
-/home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/same-file-1.0.6/src/lib.rs:
-/home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/same-file-1.0.6/src/unix.rs:
