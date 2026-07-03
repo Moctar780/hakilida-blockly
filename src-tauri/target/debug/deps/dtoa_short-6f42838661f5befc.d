@@ -1,0 +1,7 @@
+/home/moctar/Desktop/test_env/Starter-Kit-Racing/src-tauri/target/debug/deps/dtoa_short-6f42838661f5befc.d: /home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/dtoa-short-0.3.5/src/lib.rs
+
+/home/moctar/Desktop/test_env/Starter-Kit-Racing/src-tauri/target/debug/deps/libdtoa_short-6f42838661f5befc.rlib: /home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/dtoa-short-0.3.5/src/lib.rs
+
+/home/moctar/Desktop/test_env/Starter-Kit-Racing/src-tauri/target/debug/deps/libdtoa_short-6f42838661f5befc.rmeta: /home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/dtoa-short-0.3.5/src/lib.rs
+
+/home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/dtoa-short-0.3.5/src/lib.rs:

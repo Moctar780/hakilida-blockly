@@ -1,0 +1,5 @@
+/home/moctar/Desktop/test_env/Starter-Kit-Racing/src-tauri/target/debug/deps/libdbus_sys-811f5a6e321b3554.d: /home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libdbus-sys-0.2.7/src/lib.rs
+
+/home/moctar/Desktop/test_env/Starter-Kit-Racing/src-tauri/target/debug/deps/liblibdbus_sys-811f5a6e321b3554.rmeta: /home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libdbus-sys-0.2.7/src/lib.rs
+
+/home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/libdbus-sys-0.2.7/src/lib.rs:

@@ -230,6 +230,29 @@ export class Vehicle {
 
 	}
 
+	reset( position, angle ) {
+
+		if ( this.rigidBody ) {
+
+			rigidBody.setPosition( this.physicsWorld, this.rigidBody, [ position.x, position.y, position.z ], false );
+			rigidBody.setLinearVelocity( this.physicsWorld, this.rigidBody, [ 0, 0, 0 ] );
+			rigidBody.setAngularVelocity( this.physicsWorld, this.rigidBody, [ 0, 0, 0 ] );
+
+		}
+
+		this.spherePos.copy( position );
+		this.sphereVel.set( 0, 0, 0 );
+		this.linearSpeed = 0;
+		this.angularSpeed = 0;
+		this.acceleration = 0;
+		this.container.rotation.set( 0, 0, 0 );
+		this.container.quaternion.identity();
+		if ( angle ) this.container.rotation.y = angle;
+		this.prevModelPos.copy( this.spherePos );
+		this.prevModelPos.y = 0;
+
+	}
+
 	alignWithY( quaternion, newY ) {
 
 		_zAxis.set( 0, 0, 1 ).applyQuaternion( quaternion );

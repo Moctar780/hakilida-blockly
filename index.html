@@ -26,6 +26,94 @@
 		#editor-link { bottom: 12px; right: 12px; }
 		#github-link { top: 12px; right: 12px; padding: 8px; line-height: 0; }
 		#github-link svg { display: block; width: 20px; height: 20px; }
+		#reset-env { bottom: 12px; left: 92px; }
+		body.block-panel-open .corner-link { z-index: 30; }
+		body.block-panel-open #reset-env { z-index: 35; }
+
+		/* ─── Blockly panel ─────────────────────────────────── */
+		#block-toggle {
+			position: absolute;
+			bottom: 12px;
+			left: 12px;
+			z-index: 30;
+			cursor: pointer;
+		}
+		#block-panel {
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			height: 45vh;
+			z-index: 25;
+			background: #1e1e1e;
+			display: none;
+			flex-direction: column;
+			border-top: 2px solid #444;
+			overflow: hidden;
+		}
+		#block-panel.open { display: flex; }
+		#block-toolbar {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			padding: 6px 12px;
+			background: #2d2d2d;
+			border-bottom: 1px solid #444;
+			flex-shrink: 0;
+		}
+		#block-toolbar .title {
+			color: #ccc;
+			font: 600 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+			margin-right: auto;
+		}
+		#block-toolbar button {
+			font: 500 12px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+			padding: 5px 14px;
+			border: none;
+			border-radius: 6px;
+			cursor: pointer;
+			transition: background 0.15s;
+		}
+		#btn-run {
+			background: #2ea043;
+			color: #fff;
+		}
+		#btn-run:hover { background: #238636; }
+		#btn-run:disabled { opacity: 0.4; cursor: default; }
+		#btn-stop {
+			background: #da3633;
+			color: #fff;
+			display: none;
+		}
+		#btn-stop:hover { background: #c32a27; }
+		#btn-stop.visible { display: inline-block; }
+		#btn-clear {
+			background: #555;
+			color: #ccc;
+		}
+		#btn-clear:hover { background: #666; }
+		#block-status {
+			color: #aaa;
+			font: 400 11px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+			margin-left: 8px;
+		}
+		#blockly-area {
+			flex: 1;
+			min-height: 0;
+		}
+		#blockly-area .blocklySvg { background: #1e1e1e; }
+		#blockly-area .blocklyToolboxDiv {
+			background: #2d2d2d;
+		}
+		#blockly-area .blocklyTreeRow {
+			color: #ccc;
+			font: 400 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+		}
+		#blockly-area .blocklyTreeSelected { background: #445; }
+		#blockly-area .blocklyFlyoutBackground { fill: #252526; }
+		#blockly-area .blocklyText { fill: #eee; }
+		#blockly-area .blocklyEditableText text { fill: #fff; }
+		#blockly-area .blocklyFieldRect { fill: #444; }
 	</style>
 	<script type="importmap">
 	{
@@ -36,12 +124,33 @@
 		}
 	}
 	</script>
+	<!-- Blockly -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/blockly@11.2.1/blockly.min.css">
+	<script src="https://cdn.jsdelivr.net/npm/blockly@11.2.1/blockly.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/blockly@11.2.1/javascript_compressed.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/blockly@11.2.1/msg/en.js"></script>
+	<script src="js/BlocklyBlocks.js"></script>
 </head>
 <body>
 	<a id="github-link" class="corner-link" href="https://github.com/mrdoob/Starter-Kit-Racing" aria-label="View source on GitHub">
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56v-2.05c-3.2.7-3.88-1.36-3.88-1.36-.52-1.34-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.18 1.18.92-.26 1.91-.39 2.89-.39.98 0 1.97.13 2.89.39 2.21-1.5 3.18-1.18 3.18-1.18.62 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.69 5.39-5.25 5.68.41.36.78 1.06.78 2.13v3.16c0 .31.21.67.79.56C20.21 21.39 23.5 17.07 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>
 	</a>
+	<a id="block-toggle" class="corner-link" href="#">&#x1f9e9; Blocks</a>
+	<a id="reset-env" class="corner-link" href="#">&#x21ba; Reset</a>
 	<a id="editor-link" class="corner-link" href="editor.html">Create new track</a>
+
+	<!-- ─── Blockly editor panel ──────────────────────────── -->
+	<div id="block-panel">
+		<div id="block-toolbar">
+			<span class="title">Block Program</span>
+			<span id="block-status">Ready</span>
+			<button id="btn-run">▶ Run</button>
+			<button id="btn-stop">■ Stop</button>
+			<button id="btn-clear">Reset</button>
+		</div>
+		<div id="blockly-area"></div>
+	</div>
+
 	<script>
 		const map = new URLSearchParams( location.search ).get( 'map' );
 		if ( map ) {

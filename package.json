@@ -1,0 +1,17 @@
+{
+  "name": "starter-kit-racing",
+  "private": true,
+  "version": "0.1.0",
+  "description": "A 3D racing game with block-based programming",
+  "scripts": {
+    "tauri": "tauri",
+    "dev": "python3 -m http.server 8080 & sleep 1 && tauri dev",
+    "build": "tauri build",
+    "build:linux": "tauri build --target x86_64-unknown-linux-gnu",
+    "build:windows": "tauri build --target x86_64-pc-windows-msvc",
+    "build:android": "tauri build --target aarch64-linux-android"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  }
+}

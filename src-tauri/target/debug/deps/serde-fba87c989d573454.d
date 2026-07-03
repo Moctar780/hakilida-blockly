@@ -1,0 +1,14 @@
+/home/moctar/Desktop/test_env/Starter-Kit-Racing/src-tauri/target/debug/deps/serde-fba87c989d573454.d: /home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /home/moctar/Desktop/test_env/Starter-Kit-Racing/src-tauri/target/debug/build/serde-6ca711a22f956e39/out/private.rs
+
+/home/moctar/Desktop/test_env/Starter-Kit-Racing/src-tauri/target/debug/deps/libserde-fba87c989d573454.rlib: /home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /home/moctar/Desktop/test_env/Starter-Kit-Racing/src-tauri/target/debug/build/serde-6ca711a22f956e39/out/private.rs
+
+/home/moctar/Desktop/test_env/Starter-Kit-Racing/src-tauri/target/debug/deps/libserde-fba87c989d573454.rmeta: /home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /home/moctar/Desktop/test_env/Starter-Kit-Racing/src-tauri/target/debug/build/serde-6ca711a22f956e39/out/private.rs
+
+/home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs:
+/home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs:
+/home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs:
+/home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs:
+/home/moctar/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs:
+/home/moctar/Desktop/test_env/Starter-Kit-Racing/src-tauri/target/debug/build/serde-6ca711a22f956e39/out/private.rs:
+
+# env-dep:OUT_DIR=/home/moctar/Desktop/test_env/Starter-Kit-Racing/src-tauri/target/debug/build/serde-6ca711a22f956e39/out

@@ -193,4 +193,18 @@ export class LapTimer {
 
 	}
 
+	reset() {
+
+		this.lap = 1;
+		this.lastLap = null;
+		this.currentLapTime = 0;
+		this.running = false;
+		this.visitedCells.clear();
+		this.prevForwardProj = null;
+		this.currentEl.textContent = formatTime( null );
+		this.lastEl.textContent = formatTime( null );
+		this.lapEl.textContent = '1';
+
+	}
+
 }

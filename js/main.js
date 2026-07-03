@@ -13,6 +13,7 @@ import { DriftMarks } from './DriftMarks.js';
 import { GameAudio } from './Audio.js';
 import { LapTimer } from './LapTimer.js';
 import { ColorMapGLTFLoader } from './Loader.js';
+import { BlockProgram } from './BlockProgram.js';
 
 
 const renderer = new THREE.WebGLRenderer( { antialias: true, outputBufferType: THREE.HalfFloatType } );
@@ -251,6 +252,107 @@ async function init() {
 		}
 	};
 
+	// ─── Blockly integration ─────────────────────────────────────
+
+	const blockProgram = new BlockProgram();
+
+	// Register block code generators
+	if ( typeof window.registerBlockGenerators === 'function' ) {
+		window.registerBlockGenerators();
+	}
+
+	// Blockly workspace
+	const workspace = Blockly.inject( 'blockly-area', {
+		toolbox: window.TOOLBOX_XML,
+		collapse: false,
+		comments: false,
+		disable: false,
+		maxBlocks: Infinity,
+		grid: { spacing: 20, length: 3, colour: '#333', snap: true },
+		zoom: { controls: true, wheel: true, startScale: 0.9 },
+		trashcan: true,
+	});
+	Blockly.Xml.domToWorkspace( Blockly.utils.xml.textToDom( window.DEFAULT_BLOCKS_XML ), workspace );
+
+	// UI wiring
+	const blockPanel = document.getElementById( 'block-panel' );
+	const blockToggle = document.getElementById( 'block-toggle' );
+	const btnRun = document.getElementById( 'btn-run' );
+	const btnStop = document.getElementById( 'btn-stop' );
+	const btnClear = document.getElementById( 'btn-clear' );
+	const statusEl = document.getElementById( 'block-status' );
+
+	blockToggle.addEventListener( 'click', ( e ) => {
+		e.preventDefault();
+		blockPanel.classList.toggle( 'open' );
+		document.body.classList.toggle( 'block-panel-open', blockPanel.classList.contains( 'open' ) );
+		blockToggle.textContent = blockPanel.classList.contains( 'open' ) ? '✕ Close' : '🧩 Blocks';
+		// Resize Blockly when panel opens
+		if ( blockPanel.classList.contains( 'open' ) ) Blockly.svgResize( workspace );
+	} );
+
+	function getGeneratedCode() {
+		const code = Blockly.JavaScript.workspaceToCode( workspace );
+		return code;
+	}
+
+	btnRun.addEventListener( 'click', () => {
+		if ( blockProgram.running ) return;
+		const code = getGeneratedCode();
+		const ok = blockProgram.load( code );
+		if ( ! ok ) {
+			statusEl.textContent = '⚠️ Error generating program';
+			return;
+		}
+		const started = blockProgram.start();
+		if ( ! started ) {
+			statusEl.textContent = '⚠️ No commands to run';
+			return;
+		}
+		statusEl.textContent = '▶ Running…';
+		btnRun.disabled = true;
+		btnStop.classList.add( 'visible' );
+	} );
+
+	btnStop.addEventListener( 'click', () => {
+		blockProgram.stop();
+		statusEl.textContent = '■ Stopped';
+		btnRun.disabled = false;
+		btnStop.classList.remove( 'visible' );
+	} );
+
+	btnClear.addEventListener( 'click', () => {
+		blockProgram.stop();
+		workspace.clear();
+		Blockly.Xml.domToWorkspace( Blockly.utils.xml.textToDom( window.DEFAULT_BLOCKS_XML ), workspace );
+		statusEl.textContent = 'Reset';
+		btnRun.disabled = false;
+		btnStop.classList.remove( 'visible' );
+	} );
+
+	// ─── Reset environment ────────────────────────────────────────
+
+	const resetBtn = document.getElementById( 'reset-env' );
+	const defaultPos = spawn
+		? new THREE.Vector3( spawn.position[ 0 ], spawn.position[ 1 ], spawn.position[ 2 ] )
+		: new THREE.Vector3( 3.5, 0.5, 5 );
+	const defaultAngle = spawn ? spawn.angle : 0;
+
+	resetBtn.addEventListener( 'click', ( e ) => {
+		e.preventDefault();
+
+		blockProgram.stop();
+		btnRun.disabled = false;
+		btnStop.classList.remove( 'visible' );
+		statusEl.textContent = 'Ready';
+
+		vehicle.reset( defaultPos, defaultAngle );
+		lapTimer.reset();
+
+	} );
+
+	// ─── Game loop ────────────────────────────────────────────────
+
 	const timer = new THREE.Timer();
 
 	function animate() {
@@ -261,6 +363,20 @@ async function init() {
 		const dt = Math.min( timer.getDelta(), 1 / 30 );
 
 		const input = controls.update();
+
+		// Block program overrides manual controls when active
+		blockProgram.update( dt );
+		if ( blockProgram.active ) {
+			input.x = blockProgram.outputX;
+			input.z = blockProgram.outputZ;
+		}
+
+		// Update status when program finishes
+		if ( ! blockProgram.running && btnRun.disabled ) {
+			statusEl.textContent = '✅ Finished';
+			btnRun.disabled = false;
+			btnStop.classList.remove( 'visible' );
+		}
 
 		updateWorld( world, contactListener, dt );
 
