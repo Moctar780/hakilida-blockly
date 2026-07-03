@@ -42,6 +42,9 @@ jobs:
       - name: Install Tauri CLI
         run: npm install -g @tauri-apps/cli@latest
 
+      - name: Copy web assets
+        run: node scripts/copy-web.mjs
+
       - name: Build
         run: tauri build --target x86_64-unknown-linux-gnu
 
@@ -70,6 +73,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+
+      - name: Copy web assets
+        run: node scripts/copy-web.mjs
 
       - name: Install Tauri CLI
         run: npm install -g @tauri-apps/cli@latest
@@ -114,6 +120,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+
+      - name: Copy web assets
+        run: node scripts/copy-web.mjs
 
       - name: Install Tauri CLI
         run: npm install -g @tauri-apps/cli@latest
