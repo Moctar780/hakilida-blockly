@@ -158,6 +158,23 @@ jobs:
           ANDROID_HOME: /usr/local/lib/android/sdk
           NDK_HOME: /usr/local/lib/android/sdk/ndk/27.0.12077973
 
+      - name: Sign APK with debug key
+        run: |
+          find src-tauri/gen/android/app/build/outputs/apk/ -name "*unsigned*" | while read apk; do
+            signed="${apk/-unsigned/-signed}"
+            echo "Signing: $apk → $signed"
+            ls $ANDROID_HOME/build-tools/ | sort -V | tail -1 | while read bt; do
+              $ANDROID_HOME/build-tools/$bt/apksigner sign \
+                --ks ~/.android/debug.keystore \
+                --ks-pass pass:android \
+                --ks-key-alias androiddebugkey \
+                --key-pass pass:android \
+                --out "$signed" "$apk"
+            done
+          done
+        env:
+          ANDROID_HOME: /usr/local/lib/android/sdk
+
       - name: Build Android (AAB)
         run: tauri android build
         env:
@@ -168,7 +185,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Starter-Kit-Racing-Android
-          path: src-tauri/gen/android/app/build/outputs/apk/
+          path: |
+            src-tauri/gen/android/app/build/outputs/apk/
           if-no-files-found: warn
 
       - name: Upload AAB
