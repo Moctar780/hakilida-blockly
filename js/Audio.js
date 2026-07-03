@@ -34,9 +34,27 @@ export class GameAudio {
 		this.ready = false;
 		this.unlocked = false;
 
+		this.musicVol = 0.5;
+		this.sfxVol = 1.0;
+
 		this.rpm = 0;
 		this.gear = 0;
 		this.shiftCooldown = 0;
+
+	}
+
+	setMusicVolume( v ) {
+
+		this.musicVol = v;
+		if ( this.engineSound ) this.engineSound.setVolume( this.musicVol );
+		if ( this.engineLayerSound ) this.engineLayerSound.setVolume( this.musicVol * 0.4 );
+
+	}
+
+	setSfxVolume( v ) {
+
+		this.sfxVol = v;
+		if ( this.skidSound ) this.skidSound.setVolume( this.sfxVol );
 
 	}
 
@@ -187,7 +205,7 @@ export class GameAudio {
 
 		}
 
-		const targetVol = remap( absSpeed + load * 0.5, 0, 1.5, 0.02, 0.25 );
+		const targetVol = remap( absSpeed + load * 0.5, 0, 1.5, 0.02, 0.25 ) * this.musicVol;
 		const currentVol = this.engineSound.getVolume();
 		const newVol = THREE.MathUtils.lerp( currentVol, targetVol, dt * 5 );
 		this.engineSound.setVolume( newVol );
@@ -217,7 +235,7 @@ export class GameAudio {
 		}
 
 		const curSkidVol = this.skidSound.getVolume();
-		this.skidSound.setVolume( THREE.MathUtils.lerp( curSkidVol, skidVol, dt * 10 ) );
+		this.skidSound.setVolume( THREE.MathUtils.lerp( curSkidVol, skidVol * this.sfxVol, dt * 10 ) );
 
 		const skidPitch = THREE.MathUtils.clamp( Math.abs( speed ), 1, 3 );
 		const curSkidPitch = this.skidSound.getPlaybackRate();

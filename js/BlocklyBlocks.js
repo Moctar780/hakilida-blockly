@@ -154,13 +154,16 @@ window.registerBlockGenerators = function() {
 	const JS = Blockly.JavaScript;
 	const F = JS.forBlock;
 
-	// Conversion constants (calibrated for the vehicle's physics):
-	//   Forward  (throttle=0.1):  MAX_SPEED=1.5 u/s, effective ~0.12 u/s
-	//   Backward (throttle=-0.07): reached speed ~0.1 u/s, effective ~0.08 u/s
-	//   Turning  (throttle=0, steer=±1): rotation on the spot, angular vel ~0.8 rad/s ≈ 35°/s
-	const SPEED_FWD = 0.12;
-	const SPEED_BWD = 0.08;
-	const TURN_RATE = 35; // degrees per second
+	// Conversion constants (calibrated for the vehicle's physics).
+	// These are multiplied by the speed factor from settings (window.__SPEED_MULT).
+	const BASE_FWD = 0.12;
+	const BASE_BWD = 0.08;
+	const BASE_TURN = 35; // degrees per second
+
+	function speedMult() {
+		const m = window.__SPEED_MULT;
+		return ( typeof m === 'number' && m > 0 ) ? m : 1.0;
+	}
 
 	F['vehicle_on_start'] = function(block) {
 		const commands = JS.statementToCode(block, 'COMMANDS');
@@ -169,22 +172,22 @@ window.registerBlockGenerators = function() {
 
 	F['vehicle_move_forward'] = function(block) {
 		const d = JS.valueToCode(block, 'DISTANCE', JS.ORDER_ATOMIC) || '5';
-		return `  commands.push({ throttle: 0.1, steer: 0, duration: ${d} / ${SPEED_FWD} });\n`;
+		return `  commands.push({ throttle: 0.1, steer: 0, duration: ${d} / (${BASE_FWD} * ${speedMult()}) });\n`;
 	};
 
 	F['vehicle_move_backward'] = function(block) {
 		const d = JS.valueToCode(block, 'DISTANCE', JS.ORDER_ATOMIC) || '3';
-		return `  commands.push({ throttle: -0.07, steer: 0, duration: ${d} / ${SPEED_BWD} });\n`;
+		return `  commands.push({ throttle: -0.07, steer: 0, duration: ${d} / (${BASE_BWD} * ${speedMult()}) });\n`;
 	};
 
 	F['vehicle_turn_left'] = function(block) {
 		const a = JS.valueToCode(block, 'ANGLE', JS.ORDER_ATOMIC) || '90';
-		return `  commands.push({ throttle: 0, steer: -1, duration: ${a} / ${TURN_RATE} });\n`;
+		return `  commands.push({ throttle: 0, steer: -1, duration: ${a} / (${BASE_TURN} * ${speedMult()}) });\n`;
 	};
 
 	F['vehicle_turn_right'] = function(block) {
 		const a = JS.valueToCode(block, 'ANGLE', JS.ORDER_ATOMIC) || '90';
-		return `  commands.push({ throttle: 0, steer: 1, duration: ${a} / ${TURN_RATE} });\n`;
+		return `  commands.push({ throttle: 0, steer: 1, duration: ${a} / (${BASE_TURN} * ${speedMult()}) });\n`;
 	};
 
 	F['vehicle_wait'] = function(block) {

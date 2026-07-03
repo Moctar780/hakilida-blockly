@@ -14,6 +14,7 @@ import { GameAudio } from './Audio.js';
 import { LapTimer } from './LapTimer.js';
 import { ColorMapGLTFLoader } from './Loader.js';
 import { BlockProgram } from './BlockProgram.js';
+import { getSettings, getSetting, setSetting, resetSettings, onChange, t } from './Settings.js';
 
 
 const renderer = new THREE.WebGLRenderer( { antialias: true, outputBufferType: THREE.HalfFloatType } );
@@ -231,6 +232,9 @@ async function init() {
 
 	const audio = new GameAudio();
 	audio.init( cam.camera );
+	// Apply saved volume settings
+	audio.setMusicVolume( getSetting( 'musicVol' ) );
+	audio.setSfxVolume( getSetting( 'sfxVol' ) );
 
 	const lapTimer = new LapTimer( customCells, mapParam );
 
@@ -350,6 +354,94 @@ async function init() {
 		lapTimer.reset();
 
 	} );
+
+	// ─── Settings panel ────────────────────────────────────────
+
+	const settingsOverlay = document.getElementById( 'settings-overlay' );
+	const settingsBtn = document.getElementById( 'settings-btn' );
+	const setClose = document.getElementById( 'set-close' );
+	const setReset = document.getElementById( 'set-reset' );
+	const setSpeed = document.getElementById( 'set-speed' );
+	const setSpeedVal = document.getElementById( 'set-speed-val' );
+	const setLang = document.getElementById( 'set-lang' );
+	const setMusic = document.getElementById( 'set-music' );
+	const setMusicVal = document.getElementById( 'set-music-val' );
+	const setSfx = document.getElementById( 'set-sfx' );
+	const setSfxVal = document.getElementById( 'set-sfx-val' );
+	const settingsTitle = document.getElementById( 'settings-title' );
+	const lblSpeed = document.getElementById( 'lbl-speed' );
+	const lblLang = document.getElementById( 'lbl-lang' );
+	const lblMusic = document.getElementById( 'lbl-music' );
+	const lblSfx = document.getElementById( 'lbl-sfx' );
+
+	function updateSettingsUI() {
+		const s = getSettings();
+		setSpeed.value = s.speed;
+		setSpeedVal.textContent = s.speed.toFixed(1);
+		setLang.value = s.lang;
+		setMusic.value = s.musicVol;
+		setMusicVal.textContent = s.musicVol.toFixed(2);
+		setSfx.value = s.sfxVol;
+		setSfxVal.textContent = s.sfxVol.toFixed(2);
+		// Update labels
+		settingsTitle.textContent = t('title');
+		lblSpeed.textContent = t('speed');
+		lblLang.textContent = t('lang');
+		lblMusic.textContent = t('musicVol');
+		lblSfx.textContent = t('sfxVol');
+		setReset.textContent = t('reset');
+		setClose.textContent = t('close');
+	}
+
+	settingsBtn.addEventListener( 'click', ( e ) => {
+		e.preventDefault();
+		updateSettingsUI();
+		settingsOverlay.classList.add( 'open' );
+	} );
+
+	setClose.addEventListener( 'click', () => {
+		settingsOverlay.classList.remove( 'open' );
+	} );
+
+	// Close on overlay click
+	settingsOverlay.addEventListener( 'click', ( e ) => {
+		if ( e.target === settingsOverlay ) settingsOverlay.classList.remove( 'open' );
+	} );
+
+	setSpeed.addEventListener( 'input', () => {
+		const v = parseFloat( setSpeed.value );
+		setSpeedVal.textContent = v.toFixed( 1 );
+		setSetting( 'speed', v );
+	} );
+
+	setLang.addEventListener( 'change', () => {
+		setSetting( 'lang', setLang.value );
+		updateSettingsUI();
+	} );
+
+	setMusic.addEventListener( 'input', () => {
+		const v = parseFloat( setMusic.value );
+		setMusicVal.textContent = v.toFixed( 2 );
+		setSetting( 'musicVol', v );
+		if ( audio && audio.setMusicVolume ) audio.setMusicVolume( v );
+	} );
+
+	setSfx.addEventListener( 'input', () => {
+		const v = parseFloat( setSfx.value );
+		setSfxVal.textContent = v.toFixed( 2 );
+		setSetting( 'sfxVol', v );
+		if ( audio && audio.setSfxVolume ) audio.setSfxVolume( v );
+	} );
+
+	setReset.addEventListener( 'click', () => {
+		resetSettings();
+		updateSettingsUI();
+		if ( audio && audio.setMusicVolume ) audio.setMusicVolume( getSetting( 'musicVol' ) );
+		if ( audio && audio.setSfxVolume ) audio.setSfxVolume( getSetting( 'sfxVol' ) );
+	} );
+
+	// Initial UI sync
+	updateSettingsUI();
 
 	// ─── Game loop ────────────────────────────────────────────────
 
