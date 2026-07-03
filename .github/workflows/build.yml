@@ -85,7 +85,7 @@ jobs:
           if-no-files-found: warn
 
   # ────────────────────────────────────────────────────
-  # Android (APK / AAB)
+  # Android (APK + AAB)
   # ────────────────────────────────────────────────────
   build-android:
     name: Android
@@ -118,22 +118,33 @@ jobs:
       - name: Install Tauri CLI
         run: npm install -g @tauri-apps/cli@latest
 
-      - name: Setup Android SDK
+      - name: Setup Android SDK & NDK
         uses: android-actions/setup-android@v3
 
-      - name: Install Android targets & NDK
+      - name: Install NDK
         run: |
-          rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android i686-linux-android
-          cargo install cargo-ndk
+          sdkmanager --install "ndk;27.0.12077973" 2>/dev/null || true
+          echo "NDK_HOME=$ANDROID_HOME/ndk/27.0.12077973" >> $GITHUB_ENV
+        env:
+          ANDROID_HOME: /usr/local/lib/android/sdk
 
-      - name: Generate Android icons & config
+      - name: Install cargo-ndk
+        run: cargo install cargo-ndk
+
+      - name: Initialize Android project
         run: tauri android init 2>/dev/null || true
 
       - name: Build Android (APK)
         run: tauri android build --apk
         env:
-          ANDROID_HOME: ${{ env.ANDROID_HOME }}
-          NDK_HOME: ${{ env.ANDROID_NDK_HOME }}
+          ANDROID_HOME: /usr/local/lib/android/sdk
+          NDK_HOME: /usr/local/lib/android/sdk/ndk/27.0.12077973
+
+      - name: Build Android (AAB)
+        run: tauri android build
+        env:
+          ANDROID_HOME: /usr/local/lib/android/sdk
+          NDK_HOME: /usr/local/lib/android/sdk/ndk/27.0.12077973
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
@@ -141,12 +152,6 @@ jobs:
           name: Starter-Kit-Racing-Android
           path: src-tauri/gen/android/app/build/outputs/apk/
           if-no-files-found: warn
-
-      - name: Build Android (AAB)
-        run: tauri android build
-        env:
-          ANDROID_HOME: ${{ env.ANDROID_HOME }}
-          NDK_HOME: ${{ env.ANDROID_NDK_HOME }}
 
       - name: Upload AAB
         uses: actions/upload-artifact@v4

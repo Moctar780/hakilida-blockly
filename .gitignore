@@ -5,6 +5,9 @@ _godot/
 # Rust / Tauri
 src-tauri/target/
 
+# Frontend build
+www/
+
 # Node.js
 node_modules/
 

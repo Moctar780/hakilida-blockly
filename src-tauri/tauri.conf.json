@@ -2,12 +2,12 @@
   "$schema": "https://raw.githubusercontent.com/nicegui/tauri-v2-schema/refs/heads/main/tauri.conf.json",
   "productName": "Starter Kit Racing",
   "version": "0.1.0",
-  "identifier": "com.starter-kit-racing.app",
+  "identifier": "com.starter-kit-racing.game",
   "build": {
-    "frontendDist": "../",
+    "frontendDist": "../www",
     "devUrl": "http://localhost:8080",
-    "beforeDevCommand": "",
-    "beforeBuildCommand": ""
+    "beforeDevCommand": "python3 -m http.server 8080",
+    "beforeBuildCommand": "node scripts/copy-web.mjs"
   },
   "app": {
     "windows": [
