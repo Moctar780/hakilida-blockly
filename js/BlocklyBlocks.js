@@ -158,7 +158,7 @@ window.registerBlockGenerators = function() {
 	// These are multiplied by the speed factor from settings (window.__SPEED_MULT).
 	const BASE_FWD = 0.12;
 	const BASE_BWD = 0.08;
-	const BASE_TURN = 42; // degrees per second (calibrated for steer=±1, throttle=0)
+	const BASE_TURN = 120; // degrees per second (empirically calibrated)
 
 	function speedMult() {
 		const m = window.__SPEED_MULT;

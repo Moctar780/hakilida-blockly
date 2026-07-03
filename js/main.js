@@ -308,6 +308,10 @@ async function init() {
 			statusEl.textContent = '⚠️ Error generating program';
 			return;
 		}
+		// Reset vehicle state before starting a new program
+		vehicle.linearSpeed = 0;
+		vehicle.angularSpeed = 0;
+		vehicle.acceleration = 0;
 		const started = blockProgram.start();
 		if ( ! started ) {
 			statusEl.textContent = '⚠️ No commands to run';
