@@ -160,17 +160,25 @@ jobs:
 
       - name: Sign APK with debug key
         run: |
+          # Generate debug keystore if it doesn't exist (GitHub Actions runner won't have one)
+          if [ ! -f ~/.android/debug.keystore ]; then
+            mkdir -p ~/.android
+            keytool -genkey -v -keystore ~/.android/debug.keystore \
+              -alias androiddebugkey -storepass android -keypass android \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US" 2>/dev/null
+            echo "Generated debug keystore"
+          fi
           find src-tauri/gen/android/app/build/outputs/apk/ -name "*unsigned*" | while read apk; do
             signed="${apk/-unsigned/-signed}"
             echo "Signing: $apk → $signed"
-            ls $ANDROID_HOME/build-tools/ | sort -V | tail -1 | while read bt; do
-              $ANDROID_HOME/build-tools/$bt/apksigner sign \
-                --ks ~/.android/debug.keystore \
-                --ks-pass pass:android \
-                --ks-key-alias androiddebugkey \
-                --key-pass pass:android \
-                --out "$signed" "$apk"
-            done
+            bt=$(ls $ANDROID_HOME/build-tools/ | sort -V | tail -1)
+            $ANDROID_HOME/build-tools/$bt/apksigner sign \
+              --ks ~/.android/debug.keystore \
+              --ks-pass pass:android \
+              --ks-key-alias androiddebugkey \
+              --key-pass pass:android \
+              --out "$signed" "$apk"
           done
         env:
           ANDROID_HOME: /usr/local/lib/android/sdk
