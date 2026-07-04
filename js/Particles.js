@@ -124,10 +124,11 @@ export class SmokeTrails {
 			if ( p.life <= 0 ) {
 
 				this.opacities[ i ] = 0;
-				aliveCount ++;
 				continue;
 
 			}
+
+			aliveCount ++;
 
 			const t = 1 - p.life * INV_MAX_LIFE;
 

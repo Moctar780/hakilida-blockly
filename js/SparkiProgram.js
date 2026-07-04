@@ -48,10 +48,15 @@ export class SparkiProgram {
 		}
 	}
 
-	async update( dt ) {
+	/**
+	 * Tick the runner. Sends at most ONE command per frame to avoid
+	 * overlapping Bluetooth writes (race condition if multiple frames
+	 * process before a write completes).
+	 */
+	update( dt ) {
 		if ( ! this.running ) return;
 
-		// Handle wait timer
+		// If we're waiting for a delay, just count down
 		if ( this._waiting ) {
 			this._waitTimer -= dt * 1000;
 			if ( this._waitTimer <= 0 ) {
@@ -61,22 +66,23 @@ export class SparkiProgram {
 			return;
 		}
 
-		while ( this.index < this.commands.length ) {
+		// Send only ONE command per frame to avoid overlapping writes
+		if ( this.index < this.commands.length ) {
 			const cmd = this.commands[ this.index ];
 
-			// Loop markers
+			// Loop markers (instant, no bluetooth write)
 			if ( cmd === '_loop_start' ) {
 				this.foreverIndex = this.index + 1;
 				this.index++;
-				continue;
+				return;
 			}
 			if ( cmd === '_loop_end' ) {
 				if ( this.foreverIndex >= 0 ) {
 					this.index = this.foreverIndex;
-					continue;
+					return;
 				}
 				this.index++;
-				continue;
+				return;
 			}
 
 			// Wait command: W:<milliseconds>
@@ -88,21 +94,19 @@ export class SparkiProgram {
 					return;
 				}
 				this.index++;
-				continue;
+				return;
 			}
 
-			// Regular command (F, R, L, S)
+			// Send ONE command via Bluetooth (fire-and-forget, no await)
 			if ( this.bluetooth && this.bluetooth.connected ) {
-				try {
-					await this.bluetooth.send( cmd );
-				} catch ( e ) {
+				this.bluetooth.send( cmd ).catch( ( e ) => {
 					console.error( 'Send failed:', e );
 					this.stop();
-					return;
-				}
+				} );
 			}
 
 			this.index++;
+			return; // one command per frame
 		}
 
 		// End of commands — loop if forever

@@ -33,7 +33,7 @@ function saveBest( key, value ) {
 
 function formatTime( t ) {
 
-	if ( t === null || t === undefined ) return '0:00.00';
+	if ( t === null || t === undefined || Number.isNaN( t ) ) return '0:00.00';
 
 	const m = Math.floor( t / 60 );
 	const s = t - m * 60;

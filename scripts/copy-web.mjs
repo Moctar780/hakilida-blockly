@@ -9,7 +9,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
 const dest = join(root, 'www');
 
-const items = ['index.html', 'js', 'models', 'audio', 'sprites'];
+const items = ['index.html', 'editor.html', 'js', 'models', 'audio', 'sprites'];
 
 async function copyWeb() {
   await mkdir(dest, { recursive: true });

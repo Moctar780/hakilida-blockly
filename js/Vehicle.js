@@ -256,11 +256,9 @@ export class Vehicle {
 	alignWithY( quaternion, newY ) {
 
 		_zAxis.set( 0, 0, 1 ).applyQuaternion( quaternion );
-		const xAxis = _tmpVec.crossVectors( _zAxis, newY ).negate().normalize();
-		_newZ.crossVectors( xAxis, newY ).normalize();
-
-		_mat4.makeBasis( xAxis, newY, _newZ );
-		return _quat.setFromRotationMatrix( _mat4 );
+	const xAxis = _tmpVec.crossVectors( _zAxis, newY );
+	if ( xAxis.lengthSq() < 1e-10 ) return quaternion.clone();
+	xAxis.negate().normalize();
 
 	}
 

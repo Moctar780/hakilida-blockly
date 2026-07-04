@@ -31,7 +31,13 @@ bloomPass.strength = 0.02;
 bloomPass.radius = 0.02;
 bloomPass.threshold = 0.5;
 
-renderer.setEffects( [ bloomPass ] );
+// setEffects is available in Three.js r163+, but wrap in try-catch
+// to avoid crashing module load on unsupported platforms.
+try {
+	renderer.setEffects( [ bloomPass ] );
+} catch ( _e ) {
+	console.warn( 'Bloom effects not supported, continuing without' );
+}
 
 document.body.appendChild( renderer.domElement );
 
@@ -119,12 +125,6 @@ async function loadModels() {
 }
 
 async function init() {
-
-	// Fallback: auto-hide loader if game takes too long
-	setTimeout( () => {
-		const el = document.getElementById( 'loader' );
-		if ( el ) el.classList.add( 'hidden' );
-	}, 3000 );
 
 	registerAll();
 	await loadModels();
@@ -601,7 +601,7 @@ async function init() {
 		);
 
 		const mv = vehicle.modelVelocity;
-		_camLead.set( 0, 0, 1 ).applyQuaternion( vehicle.container.quaternion ).multiplyScalar( Math.sqrt( mv.x * mv.x + mv.z * mv.z ) );
+		_camLead.copy( mv );
 		cam.update( dt, vehicle.spherePos, _camLead );
 		particles.update( dt, vehicle );
 		driftMarks.update( dt, vehicle );

@@ -284,6 +284,12 @@
 	</div>
 
 	<script>
+		// Fallback: auto-hide loader even if ES module fails to load
+		setTimeout( () => {
+			const el = document.getElementById( 'loader' );
+			if ( el ) el.classList.add( 'hidden' );
+		}, 3000 );
+
 		const map = new URLSearchParams( location.search ).get( 'map' );
 		if ( map ) {
 			const link = document.getElementById( 'editor-link' );

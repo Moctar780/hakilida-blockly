@@ -208,12 +208,12 @@ export class GameAudio {
 		const targetVol = remap( absSpeed + load * 0.5, 0, 1.5, 0.02, 0.25 ) * this.musicVol;
 		const currentVol = this.engineSound.getVolume();
 		const newVol = THREE.MathUtils.lerp( currentVol, targetVol, dt * 5 );
-		this.engineSound.setVolume( newVol );
-		this.engineLayerSound.setVolume( newVol * 0.4 );
+if ( this.engineSound ) this.engineSound.setVolume( newVol );
+		if ( this.engineLayerSound ) this.engineLayerSound.setVolume( newVol * 0.4 );
 
 		const pitch = THREE.MathUtils.lerp( PITCH_LOW[ this.gear ], PITCH_HIGH[ this.gear ], this.rpm );
-		this.engineSound.setPlaybackRate( pitch );
-		this.engineLayerSound.setPlaybackRate( pitch * 0.5 );
+		if ( this.engineSound ) this.engineSound.setPlaybackRate( pitch );
+		if ( this.engineLayerSound ) this.engineLayerSound.setPlaybackRate( pitch * 0.5 );
 
 		const targetCutoff = remap( load, 0, 1, FILTER_CUTOFF_MIN, FILTER_CUTOFF_MAX );
 		this.engineFilter.frequency.setTargetAtTime(
@@ -250,6 +250,7 @@ export class GameAudio {
 		const sound = this.impactPool[ this.impactIndex ];
 		this.impactIndex = ( this.impactIndex + 1 ) % this.impactPool.length;
 
+		if ( ! sound.buffer ) return;
 		if ( sound.isPlaying ) sound.stop();
 
 		const volume = THREE.MathUtils.clamp( remap( impactVelocity, 0, 6, 0.01, 1.0 ), 0.01, 1.0 );

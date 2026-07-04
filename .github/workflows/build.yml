@@ -132,8 +132,17 @@ jobs:
 
       - name: Install NDK
         run: |
-          sdkmanager --install "ndk;27.0.12077973" 2>/dev/null || true
-          echo "NDK_HOME=$ANDROID_HOME/ndk/27.0.12077973" >> $GITHUB_ENV
+          # Install latest NDK (detect version dynamically)
+          sdkmanager --install "ndk;27.0.12077973" 2>/dev/null || sdkmanager --install "ndk" 2>/dev/null || true
+          NDK_DIR=$(ls -d $ANDROID_HOME/ndk/*/ 2>/dev/null | head -1)
+          if [ -n "$NDK_DIR" ]; then
+            NDK_VER=$(basename "$NDK_DIR")
+            echo "NDK_HOME=$ANDROID_HOME/ndk/$NDK_VER" >> $GITHUB_ENV
+            echo "Using NDK version: $NDK_VER"
+          else
+            echo "No NDK found, trying default path"
+            echo "NDK_HOME=$ANDROID_HOME/ndk/27.0.12077973" >> $GITHUB_ENV
+          fi
         env:
           ANDROID_HOME: /usr/local/lib/android/sdk
 
@@ -156,10 +165,13 @@ jobs:
         run: tauri android build --apk
         env:
           ANDROID_HOME: /usr/local/lib/android/sdk
-          NDK_HOME: /usr/local/lib/android/sdk/ndk/27.0.12077973
 
       - name: Sign APK with debug key
         run: |
+          # Find NDK and build-tools paths dynamically
+          NDK_HOME=$(ls -d $ANDROID_HOME/ndk/*/ 2>/dev/null | head -1 | xargs -I{} dirname {} | xargs -I{} ls {}/ 2>/dev/null | head -1)
+          [ -z "$NDK_HOME" ] && NDK_HOME="27.0.12077973"
+          echo "Using NDK: $NDK_HOME"
           # Generate debug keystore if it doesn't exist (GitHub Actions runner won't have one)
           if [ ! -f ~/.android/debug.keystore ]; then
             mkdir -p ~/.android
@@ -187,7 +199,6 @@ jobs:
         run: tauri android build
         env:
           ANDROID_HOME: /usr/local/lib/android/sdk
-          NDK_HOME: /usr/local/lib/android/sdk/ndk/27.0.12077973
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
