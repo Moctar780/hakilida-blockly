@@ -158,16 +158,9 @@ jobs:
           ANDROID_HOME: /usr/local/lib/android/sdk
           NDK_HOME: /usr/local/lib/android/sdk/ndk/27.0.12077973
 
-      - name: Create debug keystore
-        run: |
-          mkdir -p ~/.android
-          keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey \
-            -keypass android -keyalg RSA -keysize 2048 -validity 10000 \
-            -dname "CN=Android Debug,O=Android,C=US" -noprompt
-
       - name: Sign APK with debug key
         run: |
-          find src-tauri/gen/android/app/build/outputs/apk/ -name "*unsigned*.apk" | while read apk; do
+          find src-tauri/gen/android/app/build/outputs/apk/ -name "*unsigned*" | while read apk; do
             signed="${apk/-unsigned/-signed}"
             echo "Signing: $apk → $signed"
             ls $ANDROID_HOME/build-tools/ | sort -V | tail -1 | while read bt; do
