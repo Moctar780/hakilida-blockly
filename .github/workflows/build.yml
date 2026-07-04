@@ -181,7 +181,7 @@ jobs:
               -dname "CN=Android Debug,O=Android,C=US" 2>/dev/null
             echo "Generated debug keystore"
           fi
-          find src-tauri/gen/android/app/build/outputs/apk/ -name "*unsigned*" | while read apk; do
+          find src-tauri/gen/android/app/build/outputs/apk/ -name "*unsigned.apk" | while read apk; do
             signed="${apk/-unsigned/-signed}"
             echo "Signing: $apk → $signed"
             bt=$(ls $ANDROID_HOME/build-tools/ | sort -V | tail -1)
