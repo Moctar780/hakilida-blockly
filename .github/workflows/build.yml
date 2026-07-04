@@ -167,7 +167,7 @@ jobs:
 
       - name: Sign APK with debug key
         run: |
-          find src-tauri/gen/android/app/build/outputs/apk/ -name "*unsigned*" | while read apk; do
+          find src-tauri/gen/android/app/build/outputs/apk/ -name "*unsigned*.apk" | while read apk; do
             signed="${apk/-unsigned/-signed}"
             echo "Signing: $apk → $signed"
             ls $ANDROID_HOME/build-tools/ | sort -V | tail -1 | while read bt; do
