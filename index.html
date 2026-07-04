@@ -168,6 +168,17 @@
 			font: 400 11px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 			margin-left: 8px;
 		}
+		#bt-status {
+			font-size: 11px; padding: 3px 8px; border-radius: 4px;
+			background: #444; color: #aaa; cursor: pointer;
+			border: none; font-family: inherit;
+		}
+		#bt-status.connected { background: #1a6b2c; color: #8ff99f; }
+		#mode-select {
+			font-size: 11px; padding: 3px 6px; border-radius: 4px;
+			background: #444; color: #ccc; border: 1px solid #666;
+			font-family: inherit; cursor: pointer;
+		}
 		#blockly-area {
 			flex: 1;
 			min-height: 0;
@@ -201,6 +212,7 @@
 	<script src="https://cdn.jsdelivr.net/npm/blockly@11.2.1/javascript_compressed.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/blockly@11.2.1/msg/en.js"></script>
 	<script src="js/BlocklyBlocks.js"></script>
+	<script src="js/SparkiBlocks.js"></script>
 </head>
 <body>
 	<div id="loader">
@@ -258,6 +270,11 @@
 	<div id="block-panel">
 		<div id="block-toolbar">
 			<span class="title">Block Program</span>
+			<select id="mode-select">
+				<option value="racing">🏎️ Racing</option>
+				<option value="sparki">🤖 Sparki</option>
+			</select>
+			<button id="bt-status">📡 BT Off</button>
 			<span id="block-status">Ready</span>
 			<button id="btn-run">▶ Run</button>
 			<button id="btn-stop">■ Stop</button>

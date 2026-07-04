@@ -14,6 +14,8 @@ import { GameAudio } from './Audio.js';
 import { LapTimer } from './LapTimer.js';
 import { ColorMapGLTFLoader } from './Loader.js';
 import { BlockProgram } from './BlockProgram.js';
+import { SparkiProgram } from './SparkiProgram.js';
+import { SparkiBluetooth } from './Bluetooth.js';
 import { getSettings, getSetting, setSetting, resetSettings, onChange, t } from './Settings.js';
 
 
@@ -284,22 +286,77 @@ async function init() {
 	});
 	Blockly.Xml.domToWorkspace( Blockly.utils.xml.textToDom( window.DEFAULT_BLOCKS_XML ), workspace );
 
-	// UI wiring
+	// Register Sparki generators if available
+	if ( typeof window.registerSparkiGenerators === 'function' ) {
+		window.registerSparkiGenerators();
+	}
+
+	// ─── UI wiring ───────────────────────────────────────────────
+
 	const blockPanel = document.getElementById( 'block-panel' );
 	const blockToggle = document.getElementById( 'block-toggle' );
 	const btnRun = document.getElementById( 'btn-run' );
 	const btnStop = document.getElementById( 'btn-stop' );
 	const btnClear = document.getElementById( 'btn-clear' );
 	const statusEl = document.getElementById( 'block-status' );
+	const modeSelect = document.getElementById( 'mode-select' );
+	const btStatusBtn = document.getElementById( 'bt-status' );
 
-	blockToggle.addEventListener( 'click', ( e ) => {
-		e.preventDefault();
-		blockPanel.classList.toggle( 'open' );
-		document.body.classList.toggle( 'block-panel-open', blockPanel.classList.contains( 'open' ) );
-		blockToggle.textContent = blockPanel.classList.contains( 'open' ) ? '✕ Close' : '🧩 Blocks';
-		// Resize Blockly when panel opens
-		if ( blockPanel.classList.contains( 'open' ) ) Blockly.svgResize( workspace );
+	// ─── Bluetooth & Sparki ──────────────────────────────────────
+
+	const sparkiBT = new SparkiBluetooth();
+	const sparkiProg = new SparkiProgram( sparkiBT );
+	let currentMode = 'racing';
+
+	modeSelect.addEventListener( 'change', () => {
+		currentMode = modeSelect.value;
+		blockProgram.stop();
+
+		if ( currentMode === 'sparki' ) {
+			// Switch to Sparki toolbox
+			workspace.clear();
+			Blockly.Xml.domToWorkspace(
+				Blockly.utils.xml.textToDom( window.DEFAULT_SPARKI_XML ), workspace
+			);
+			workspace.updateToolbox( window.SPARKI_TOOLBOX_XML );
+			statusEl.textContent = '🤖 Sparki mode';
+			btStatusBtn.style.display = 'inline-block';
+		} else {
+			// Switch to Racing toolbox
+			workspace.clear();
+			Blockly.Xml.domToWorkspace(
+				Blockly.utils.xml.textToDom( window.DEFAULT_BLOCKS_XML ), workspace
+			);
+			workspace.updateToolbox( window.TOOLBOX_XML );
+			statusEl.textContent = '🏎️ Racing mode';
+			btStatusBtn.style.display = 'none';
+		}
 	} );
+
+	btStatusBtn.addEventListener( 'click', async () => {
+		if ( sparkiBT.connected ) {
+			sparkiBT.disconnect();
+			btStatusBtn.textContent = '📡 BT Off';
+			btStatusBtn.className = '';
+			return;
+		}
+		try {
+			btStatusBtn.textContent = '📡 Connecting…';
+			await sparkiBT.connect();
+			btStatusBtn.textContent = '📡 BT On';
+			btStatusBtn.className = 'connected';
+			statusEl.textContent = '✅ Bluetooth connected';
+		} catch ( e ) {
+			btStatusBtn.textContent = '📡 Failed';
+			console.error( 'BT error:', e );
+			setTimeout( () => {
+				btStatusBtn.textContent = '📡 BT Off';
+				btStatusBtn.className = '';
+			}, 3000 );
+		}
+	} );
+
+	// ─── Run / Stop wiring ───────────────────────────────────────
 
 	function getGeneratedCode() {
 		const code = Blockly.JavaScript.workspaceToCode( workspace );
@@ -307,6 +364,26 @@ async function init() {
 	}
 
 	btnRun.addEventListener( 'click', () => {
+		if ( currentMode === 'sparki' ) {
+			if ( sparkiProg.running ) return;
+			const code = getGeneratedCode();
+			const ok = sparkiProg.load( code );
+			if ( ! ok ) {
+				statusEl.textContent = '⚠️ Error generating Sparki program';
+				return;
+			}
+			if ( ! sparkiBT.connected ) {
+				statusEl.textContent = '⚠️ Bluetooth not connected';
+				return;
+			}
+			sparkiProg.start();
+			statusEl.textContent = '▶️ Running on Sparki…';
+			btnRun.disabled = true;
+			btnStop.classList.add( 'visible' );
+			return;
+		}
+
+		// ─── Racing mode ─────────────────────────────────────────
 		if ( blockProgram.running ) return;
 		const code = getGeneratedCode();
 		const ok = blockProgram.load( code );
@@ -329,6 +406,13 @@ async function init() {
 	} );
 
 	btnStop.addEventListener( 'click', () => {
+		if ( currentMode === 'sparki' ) {
+			sparkiProg.stop();
+			statusEl.textContent = '■ Stopped';
+			btnRun.disabled = false;
+			btnStop.classList.remove( 'visible' );
+			return;
+		}
 		blockProgram.stop();
 		statusEl.textContent = '■ Stopped';
 		btnRun.disabled = false;
@@ -337,11 +421,23 @@ async function init() {
 
 	btnClear.addEventListener( 'click', () => {
 		blockProgram.stop();
+		sparkiProg.stop();
 		workspace.clear();
-		Blockly.Xml.domToWorkspace( Blockly.utils.xml.textToDom( window.DEFAULT_BLOCKS_XML ), workspace );
+		const xml = currentMode === 'sparki' ? window.DEFAULT_SPARKI_XML : window.DEFAULT_BLOCKS_XML;
+		Blockly.Xml.domToWorkspace( Blockly.utils.xml.textToDom( xml ), workspace );
 		statusEl.textContent = 'Reset';
 		btnRun.disabled = false;
 		btnStop.classList.remove( 'visible' );
+	} );
+
+	// ─── Block toggle ────────────────────────────────────────────
+
+	blockToggle.addEventListener( 'click', ( e ) => {
+		e.preventDefault();
+		blockPanel.classList.toggle( 'open' );
+		document.body.classList.toggle( 'block-panel-open', blockPanel.classList.contains( 'open' ) );
+		blockToggle.textContent = blockPanel.classList.contains( 'open' ) ? '✕ Close' : '🧩 Blocks';
+		if ( blockPanel.classList.contains( 'open' ) ) Blockly.svgResize( workspace );
 	} );
 
 	// ─── Reset environment ────────────────────────────────────────
@@ -470,15 +566,25 @@ async function init() {
 
 		const input = controls.update();
 
-		// Block program overrides manual controls when active
-		blockProgram.update( dt );
-		if ( blockProgram.active ) {
-			input.x = blockProgram.outputX;
-			input.z = blockProgram.outputZ;
+		// Run the active program (Racing or Sparki)
+		if ( currentMode === 'sparki' ) {
+			sparkiProg.update( dt );
+		} else {
+			blockProgram.update( dt );
+			if ( blockProgram.active ) {
+				input.x = blockProgram.outputX;
+				input.z = blockProgram.outputZ;
+			}
 		}
 
 		// Update status when program finishes
-		if ( ! blockProgram.running && btnRun.disabled ) {
+		if ( currentMode === 'sparki' ) {
+			if ( ! sparkiProg.running && btnRun.disabled ) {
+				statusEl.textContent = '✅ Sparki finished';
+				btnRun.disabled = false;
+				btnStop.classList.remove( 'visible' );
+			}
+		} else if ( ! blockProgram.running && btnRun.disabled ) {
 			statusEl.textContent = '✅ Finished';
 			btnRun.disabled = false;
 			btnStop.classList.remove( 'visible' );
