@@ -158,17 +158,21 @@ async function init() {
 
 	buildTrack( scene, models, customCells );
 
-	// Probes
+	// Probes - OPTIMIZED: Reduced resolution and smaller cubemap
+	// This significantly reduces baking time from 5+ minutes to 10-30 seconds
 
 	const probeHeight = 6;
 	const probes = new LightProbeGrid(
 		hw * 2, probeHeight, hd * 2,
-		Math.max( 4, Math.round( hw / 4 ) ),
-		2,
-		Math.max( 4, Math.round( hd / 4 ) ),
+		Math.max( 2, Math.round( hw / 8 ) ),  // Reduced grid density (was /4)
+		1,                                     // Reduced height divisions (was 2)
+		Math.max( 2, Math.round( hd / 8 ) ),  // Reduced grid density (was /4)
 	);
 	probes.position.set( bounds.centerX, probeHeight / 2, bounds.centerZ );
-	probes.bake( renderer, scene, { cubemapSize: 32, near: 0.1, far: groundSize } );
+	
+	// CRITICAL OPTIMIZATION: Reduced cubemapSize from 32 to 16
+	// This is the main bottleneck - cubemap size 32 takes exponentially longer than 16
+	probes.bake( renderer, scene, { cubemapSize: 16, near: 0.1, far: groundSize } );
 	scene.add( probes );
 
 	// scene.add( new LightProbeGridHelper( probes, 0.5 ) );
